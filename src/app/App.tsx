@@ -1,13 +1,13 @@
 import React from 'react'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { theme } from './theme'
-import { HomePage } from '../pages/home/HomePage'
+import { Routes } from './Routes'
 
 const App: React.FunctionComponent = () => {
   return (
     <React.StrictMode>
       <ThemeProvider theme={theme}>
-        <HomePage />
+        <Routes />
       </ThemeProvider>
     </React.StrictMode>
   )
