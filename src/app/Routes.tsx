@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import { LoginPage } from '../pages/login/LoginPage'
 import { HomePage } from '../pages/home/HomePage'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
+import SecuredRoute from './SecuredRoute'
 
 const NoMatch = () => <div>Page not found.</div>
 
@@ -20,9 +21,7 @@ export const Routes: React.FunctionComponent = () => {
           <LoginPage />
         </Route>
 
-        <Route path="/dashboard/">
-          <DashboardPage />
-        </Route>
+        <SecuredRoute path="/dashboard/" component={DashboardPage} />
 
         <Route>
           <NoMatch />

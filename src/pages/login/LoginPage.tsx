@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { makeStyles, createStyles, Grid, Button, Card } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import InputText from '../../components/InputText'
-import { validateUser } from '../../api/UserAuthenticator'
+import { loginUser } from '../../api/Authentication'
+import { loginStart, loginSuccess } from './loginSlice'
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -22,6 +24,8 @@ const useStyles = makeStyles(() =>
 export const LoginPage: React.FunctionComponent = () => {
   const classes = useStyles()
 
+  const dispatch = useDispatch()
+
   const history = useHistory()
 
   const [email, setEmail] = useState<string>('')
@@ -37,8 +41,12 @@ export const LoginPage: React.FunctionComponent = () => {
   }
 
   const submitLogin = () => {
-    validateUser(email, password).then((res) => {
+    dispatch(loginStart())
+    loginUser(email, password).then((res) => {
       if (res) {
+        const userEmail = email
+        const userPassword = password
+        dispatch(loginSuccess({ userEmail, userPassword }))
         history.push('/dashboard')
       }
     })
