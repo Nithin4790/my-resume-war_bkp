@@ -4,6 +4,7 @@ import { LoginPage } from '../pages/login/LoginPage'
 import { HomePage } from '../pages/home/HomePage'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
 import SecuredRoute from './SecuredRoute'
+import PublicRoute from './PublicRoute'
 
 const NoMatch = () => <div>Page not found.</div>
 
@@ -17,9 +18,7 @@ export const Routes: React.FunctionComponent = () => {
           <HomePage />
         </Route>
 
-        <Route path="/login/">
-          <LoginPage />
-        </Route>
+        <PublicRoute path="/login/" component={LoginPage} />
 
         <SecuredRoute path="/dashboard/" component={DashboardPage} />
 
