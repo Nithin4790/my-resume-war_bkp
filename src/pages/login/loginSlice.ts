@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { AppThunk } from '../../app/store'
 
 export interface LoginState {
   userPassword: string | undefined
-  userEmail: string | undefined
+  userIdentifier: string | undefined
   isLogging: boolean
   isLogged: boolean
   error: string | undefined
@@ -10,7 +11,7 @@ export interface LoginState {
 
 const initialLoginState: LoginState = {
   userPassword: undefined,
-  userEmail: undefined,
+  userIdentifier: undefined,
   isLogging: false,
   isLogged: false,
   error: undefined,
@@ -26,13 +27,13 @@ const loginSlice = createSlice({
     },
     loginSuccess(
       loginState: LoginState,
-      action: PayloadAction<{ userEmail: string; userPassword: string }>
+      action: PayloadAction<{ userIdentifier: string; userPassword: string }>
     ) {
       const state = loginState
       state.isLogged = true
       state.isLogging = false
       state.userPassword = action.payload.userPassword
-      state.userEmail = action.payload.userEmail
+      state.userIdentifier = action.payload.userIdentifier
     },
     loginError(loginState: LoginState, action: PayloadAction<string>) {
       const state = loginState
@@ -45,3 +46,16 @@ const loginSlice = createSlice({
 export const { loginStart, loginSuccess, loginError } = loginSlice.actions
 
 export default loginSlice.reducer
+
+export const authenticateUser = (
+  userIdentifier: string,
+  userPassword: string
+): AppThunk => async (dispatch) => {
+  try {
+    dispatch(loginStart())
+
+    dispatch(loginSuccess({ userIdentifier, userPassword }))
+  } catch (err) {
+    dispatch(loginError('Login failed'))
+  }
+}

@@ -20,7 +20,7 @@ const PublicRoute = (props: PrivateRouteProps) => {
           isAuthenticated ? (
             <Redirect
               to={{
-                pathname: '/dashboard',
+                pathname: '/dashboard/',
                 state: { from: routeProps.location },
               }}
             />

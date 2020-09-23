@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios'
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import { API_BASE_URL } from '../utils/constants'
 
 const instance = axios.create({
@@ -14,6 +14,15 @@ instance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`
     }
     return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
+instance.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response
   },
   (error) => {
     return Promise.reject(error)

@@ -1,4 +1,4 @@
-import axios from './axios'
+import instance from './axios'
 
 export async function loginUser(
   userEmail: string,
@@ -7,21 +7,15 @@ export async function loginUser(
   const url = '/auth/local/'
   let success = false
   if (userEmail !== '' && userPassword !== '') {
-    await axios
-      .post(url, {
-        identifier: userEmail,
-        password: userPassword,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          localStorage.setItem('access_token', JSON.stringify(res.data.jwt))
-          success = true
-        }
-      })
+    const data = await instance.post(url, {
+      identifier: userEmail,
+      password: userPassword,
+    })
+
+    if (data) {
+      localStorage.setItem('access_token', JSON.stringify(data.data.jwt))
+      success = true
+    }
   }
   return success
-}
-
-export function logoutUser(): void {
-  localStorage.removeItem('access_token')
 }

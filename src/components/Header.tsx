@@ -5,10 +5,11 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import { Link } from 'react-router-dom'
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
       flexGrow: 1,
+      backgroundColor: theme.palette.secondary.main,
     },
     link: {
       fontSize: 15,
