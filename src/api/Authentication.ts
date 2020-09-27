@@ -1,3 +1,4 @@
+import { ACCESS_TOKEN_KEY } from '../utils/constants'
 import instance from './axios'
 
 export async function loginUser(
@@ -18,4 +19,18 @@ export async function loginUser(
     }
   }
   return success
+}
+
+export const validateUser = (): boolean => {
+  if (localStorage.getItem(ACCESS_TOKEN_KEY)) return true
+  return false
+}
+
+export const logout = (): boolean => {
+  try {
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+    return true
+  } catch (err) {
+    return false
+  }
 }

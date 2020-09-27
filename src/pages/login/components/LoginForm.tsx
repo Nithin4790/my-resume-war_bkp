@@ -1,17 +1,13 @@
-import React from 'react'
-import { withFormik, FormikProps } from 'formik'
+import React, { useEffect } from 'react'
+import { Formik, Form, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import {
-  InputAdornment,
-  makeStyles,
-  TextField,
-  Theme,
-  Typography,
-} from '@material-ui/core'
-import Button from '@material-ui/core/Button/Button'
+import { makeStyles, Theme, InputAdornment, TextField, Button } from '@material-ui/core'
 import NameIcon from '@material-ui/icons/SupervisorAccount'
 import LockIcon from '@material-ui/icons/Lock'
-import { loginUser } from '../../../api/Authentication'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { authenticateUser } from '../loginSlice'
+import { RootState } from '../../../app/rootReducer'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -33,114 +29,116 @@ const useStyles = makeStyles((theme: Theme) => ({
     color: '#FFFFFF',
     backgroundColor: theme.palette.primary.main,
   },
-  errorText: {
-    color: '#FF0000',
-  },
 }))
 
-interface LoginValues {
-  identifier: string
-  password: string
-}
-
-interface InitialLoginValues {
-  initialIdentifier?: string
-  initialPassword?: string
-}
-
-// Aside: You may see InjectedFormikProps<OtherProps, FormValues> instead of what comes below in older code.. InjectedFormikProps was artifact of when Formik only exported a HoC. It is also less flexible as it MUST wrap all props (it passes them through).
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const Form = (props: FormikProps<{ identifier: string; password: string }>) => {
+const LoginForm: React.FunctionComponent = () => {
   const classes = useStyles()
-  const {
-    values: { identifier, password },
-    errors,
-    touched,
-    handleSubmit,
-    handleChange,
-    isValid,
-  } = props
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const isLoggedIn = useSelector((state: RootState) => state.loginReducer.isLogged)
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      history.push('/dashboard')
+    }
+  }, [history, isLoggedIn])
+
+  interface LoginType {
+    identifier: string
+    password: string
+  }
+
+  const initialLoginVals: LoginType = {
+    identifier: '',
+    password: '',
+  }
+
+  const handleSubmit = async (auth: LoginType) => {
+    dispatch(authenticateUser(auth.identifier, auth.password))
+  }
+
   return (
-    <form onSubmit={handleSubmit} className={classes.form}>
-      <TextField
-        variant="outlined"
-        margin="normal"
-        helperText={touched.identifier ? errors.identifier : ''}
-        error={Boolean(errors.identifier)}
-        required
-        fullWidth
-        id="identifier"
-        label="Email Address/Username"
-        type="text"
-        value={identifier}
-        onChange={handleChange}
-        name="identifier"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <NameIcon />
-            </InputAdornment>
-          ),
+    <div>
+      <Formik
+        initialValues={initialLoginVals}
+        validationSchema={Yup.object().shape({
+          identifier: Yup.string().required('Email/Username is required'),
+          password: Yup.string().required('Password is required'),
+        })}
+        onSubmit={(values: LoginType) => {
+          handleSubmit(values)
         }}
-      />
-      <div>
-        <Typography variant="body2" gutterBottom className={classes.errorText}>
-          {errors.identifier ? errors.identifier : ''}
-        </Typography>
-      </div>
-
-      <TextField
-        variant="outlined"
-        margin="normal"
-        name="password"
-        helperText={touched.password ? errors.password : ''}
-        error={Boolean(errors.password)}
-        label="Password"
-        fullWidth
-        type="password"
-        value={password}
-        onChange={handleChange}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <LockIcon />
-            </InputAdornment>
-          ),
-        }}
-      />
-      <div>
-        <Typography variant="body2" gutterBottom className={classes.errorText}>
-          {errors.password}
-        </Typography>
-      </div>
-
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        className={classes.submit}
-        disabled={!isValid}
       >
-        Sign In
-      </Button>
-    </form>
+        {(props: FormikProps<LoginType>) => {
+          const {
+            values,
+            touched,
+            errors,
+            handleBlur,
+            handleChange,
+            isSubmitting,
+          } = props
+          return (
+            <Form>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                helperText={touched.identifier ? errors.identifier : ''}
+                error={Boolean(errors.identifier)}
+                required
+                fullWidth
+                id="identifier"
+                label="Email Address/Username"
+                type="text"
+                value={values.identifier}
+                onChange={handleChange}
+                name="identifier"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <NameIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                onBlur={handleBlur}
+              />
+
+              <TextField
+                variant="outlined"
+                margin="normal"
+                name="password"
+                helperText={touched.password ? errors.password : ''}
+                error={Boolean(errors.password)}
+                label="Password"
+                fullWidth
+                type="password"
+                value={values.password}
+                onChange={handleChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                onBlur={handleBlur}
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                className={classes.submit}
+                disabled={isSubmitting}
+              >
+                Sign In
+              </Button>
+            </Form>
+          )
+        }}
+      </Formik>
+    </div>
   )
 }
-
-const LoginForm = withFormik<InitialLoginValues, LoginValues>({
-  mapPropsToValues: (props) => ({
-    identifier: props.initialIdentifier || '',
-    password: props.initialPassword || '',
-  }),
-
-  validationSchema: Yup.object().shape({
-    identifier: Yup.string().required('Email or Username is required'),
-    password: Yup.string().required('Password is required'),
-  }),
-
-  handleSubmit({ identifier, password }: LoginValues) {
-    loginUser(identifier, password)
-  },
-})(Form)
 
 export default LoginForm
