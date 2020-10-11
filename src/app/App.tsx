@@ -5,11 +5,9 @@ import { Routes } from './Routes'
 
 const App: React.FunctionComponent = () => {
   return (
-    <React.StrictMode>
-      <ThemeProvider theme={theme}>
-        <Routes />
-      </ThemeProvider>
-    </React.StrictMode>
+    <ThemeProvider theme={theme}>
+      <Routes />
+    </ThemeProvider>
   )
 }
 

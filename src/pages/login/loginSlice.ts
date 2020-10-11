@@ -44,6 +44,7 @@ const loginSlice = createSlice({
     logoutUser(loginState: LoginState) {
       const state = loginState
       state.isLogged = false
+      state.error = undefined
     },
   },
 })

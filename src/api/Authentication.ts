@@ -1,24 +1,25 @@
 import { ACCESS_TOKEN_KEY } from '../utils/constants'
 import instance from './axios'
 
-export async function loginUser(
-  userEmail: string,
-  userPassword: string
-): Promise<boolean> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function loginUser(userEmail: string, userPassword: string): Promise<any> {
   const url = '/auth/local/'
-  let success = false
+  let data = {}
   if (userEmail !== '' && userPassword !== '') {
-    const data = await instance.post(url, {
-      identifier: userEmail,
-      password: userPassword,
-    })
-
-    if (data) {
-      localStorage.setItem('access_token', JSON.stringify(data.data.jwt))
-      success = true
+    try {
+      const response = await instance.post(url, {
+        identifier: userEmail,
+        password: userPassword,
+      })
+      data = response
+      if (response.status === 200 || response.status === 201) {
+        localStorage.setItem('access_token', JSON.stringify(response.data.jwt))
+      }
+    } catch (err) {
+      data = err
     }
   }
-  return success
+  return data
 }
 
 export const validateUser = (): boolean => {

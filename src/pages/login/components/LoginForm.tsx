@@ -1,12 +1,23 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Formik, Form, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { makeStyles, Theme, InputAdornment, TextField, Button } from '@material-ui/core'
+import {
+  makeStyles,
+  Theme,
+  InputAdornment,
+  TextField,
+  Button,
+  FormControlLabel,
+  Checkbox,
+} from '@material-ui/core'
 import NameIcon from '@material-ui/icons/SupervisorAccount'
 import LockIcon from '@material-ui/icons/Lock'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { authenticateUser } from '../loginSlice'
+import { Alert, AlertTitle } from '@material-ui/lab'
+import { loginError, loginStart, loginSuccess } from '../loginSlice'
+import { loginUser, validateUser } from '../../../api/Authentication'
+import { INVALID_CREDS, NETWORK_ERROR } from '../../../utils/error'
 import { RootState } from '../../../app/rootReducer'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -35,26 +46,47 @@ const LoginForm: React.FunctionComponent = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const history = useHistory()
-  const isLoggedIn = useSelector((state: RootState) => state.loginReducer.isLogged)
+  const [error, setError] = useState<string | undefined>('')
+  const errorState = useSelector((state: RootState) => state.loginReducer.error)
 
   useEffect(() => {
-    if (isLoggedIn) {
-      history.push('/dashboard')
-    }
-  }, [history, isLoggedIn])
+    setError(errorState)
+  }, [dispatch, errorState])
 
   interface LoginType {
     identifier: string
     password: string
+    rememberUser: boolean
   }
 
+  const rememberedUser = localStorage.getItem('default-user')
+
   const initialLoginVals: LoginType = {
-    identifier: '',
+    identifier: rememberedUser !== null ? rememberedUser : '',
     password: '',
+    rememberUser: true,
   }
 
   const handleSubmit = async (auth: LoginType) => {
-    dispatch(authenticateUser(auth.identifier, auth.password))
+    dispatch(loginStart())
+    const creds = {
+      userIdentifier: auth.identifier,
+      userPassword: auth.password,
+    }
+
+    if (auth.rememberUser) localStorage.setItem('default-user', auth.identifier)
+    else localStorage.removeItem('default-user')
+
+    await loginUser(auth.identifier, auth.password).then((data) => {
+      if (validateUser()) {
+        dispatch(loginSuccess(creds))
+        history.push('/dashboard/')
+      } else if (data.response !== 200 || data.response !== 201) {
+        dispatch(loginError(INVALID_CREDS))
+      } else {
+        dispatch(loginError(NETWORK_ERROR))
+      }
+    })
   }
 
   return (
@@ -70,20 +102,13 @@ const LoginForm: React.FunctionComponent = () => {
         }}
       >
         {(props: FormikProps<LoginType>) => {
-          const {
-            values,
-            touched,
-            errors,
-            handleBlur,
-            handleChange,
-            isSubmitting,
-          } = props
+          const { values, errors, handleBlur, handleChange } = props
           return (
             <Form>
               <TextField
                 variant="outlined"
                 margin="normal"
-                helperText={touched.identifier ? errors.identifier : ''}
+                helperText={errors.identifier}
                 error={Boolean(errors.identifier)}
                 required
                 fullWidth
@@ -107,7 +132,7 @@ const LoginForm: React.FunctionComponent = () => {
                 variant="outlined"
                 margin="normal"
                 name="password"
-                helperText={touched.password ? errors.password : ''}
+                helperText={errors.password}
                 error={Boolean(errors.password)}
                 label="Password"
                 fullWidth
@@ -123,13 +148,24 @@ const LoginForm: React.FunctionComponent = () => {
                 }}
                 onBlur={handleBlur}
               />
-
+              <FormControlLabel
+                control={
+                  // eslint-disable-next-line react/jsx-wrap-multilines
+                  <Checkbox
+                    defaultChecked
+                    name="rememberUser"
+                    color="primary"
+                    value={values.rememberUser}
+                    onChange={handleChange}
+                  />
+                }
+                label="Remember me"
+              />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 className={classes.submit}
-                disabled={isSubmitting}
               >
                 Sign In
               </Button>
@@ -137,6 +173,12 @@ const LoginForm: React.FunctionComponent = () => {
           )
         }}
       </Formik>
+      {error && (
+        <Alert severity="error">
+          <AlertTitle>Error</AlertTitle>
+          {error}
+        </Alert>
+      )}
     </div>
   )
 }

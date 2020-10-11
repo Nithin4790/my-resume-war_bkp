@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     title: {
       flexGrow: 1,
+      maxWidth: '92%',
     },
   })
 )
@@ -28,6 +29,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const Header: React.FunctionComponent = () => {
   const classes = useStyles()
   const isLoggedIn = validateUser()
+
+  const ref = React.useRef<HTMLDivElement>(null)
 
   return (
     <div className={classes.root}>
@@ -37,7 +40,7 @@ const Header: React.FunctionComponent = () => {
             MyResume
           </Typography>
           {isLoggedIn ? (
-            <DashboardMainMenu />
+            <DashboardMainMenu ref={ref} />
           ) : (
             <Link to="/login" className={classes.link}>
               Sign In

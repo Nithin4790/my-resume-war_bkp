@@ -5,7 +5,7 @@ import { HomePage } from '../pages/home/HomePage'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
 import SecuredRoute from './SecuredRoute'
 import PublicRoute from './PublicRoute'
-import { Signup } from '../pages/signup/SignupPage'
+import SignupPage from '../pages/signup/SignupPage'
 
 const NoMatch = () => <div>Page not found.</div>
 
@@ -23,7 +23,7 @@ export const Routes: React.FunctionComponent = () => {
 
         <SecuredRoute path="/dashboard" component={DashboardPage} exact />
 
-        <PublicRoute path="/signup" component={Signup} />
+        <PublicRoute path="/signup" component={SignupPage} />
 
         <Route>
           <NoMatch />

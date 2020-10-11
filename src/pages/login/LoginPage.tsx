@@ -30,29 +30,31 @@ const useStyles = makeStyles((theme: Theme) => ({
 const LoginPage: React.FunctionComponent = () => {
   const classes = useStyles()
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
-        <LoginForm />
-        <Grid container>
-          <Grid item xs>
-            <Link to="/login">Forgot password?</Link>
+    <React.StrictMode>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign in
+          </Typography>
+          <LoginForm />
+          <Grid container>
+            <Grid item xs>
+              <Link to="/login">Forgot password?</Link>
+            </Grid>
+            <Grid item>
+              <Link to="/signup">Don&apos;t have an account? Sign Up</Link>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Link to="/signup">Don&apos;t have an account? Sign Up</Link>
-          </Grid>
-        </Grid>
-      </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
-    </Container>
+        </div>
+        <Box mt={8}>
+          <Copyright />
+        </Box>
+      </Container>
+    </React.StrictMode>
   )
 }
 
