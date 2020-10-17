@@ -1,6 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { loginUser } from '../../api/Authentication'
-import { AppThunk } from '../../app/store'
 
 export interface LoginState {
   userPassword: string | undefined
@@ -52,17 +50,3 @@ const loginSlice = createSlice({
 export const { loginStart, loginSuccess, loginError, logoutUser } = loginSlice.actions
 
 export default loginSlice.reducer
-
-export const authenticateUser = (
-  userIdentifier: string,
-  userPassword: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): AppThunk => async (dispatch: any) => {
-  try {
-    dispatch(loginStart())
-    const authStatus = loginUser(userIdentifier, userPassword)
-    if (authStatus) dispatch(loginSuccess({ userIdentifier, userPassword }))
-  } catch (err) {
-    dispatch(loginError('Login failed'))
-  }
-}

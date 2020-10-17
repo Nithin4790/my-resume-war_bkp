@@ -12,6 +12,9 @@ import {
 } from '@material-ui/core'
 import NameIcon from '@material-ui/icons/SupervisorAccount'
 import LockIcon from '@material-ui/icons/Lock'
+import { useHistory } from 'react-router-dom'
+import { SignupType } from '../../../api/model'
+import { registerUser } from '../../../api/Signup'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -37,13 +40,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const SignupForm: React.FunctionComponent = () => {
   const classes = useStyles()
-
-  interface SignupType {
-    username: string
-    email: string
-    password: string
-    confirmPassword: string
-  }
+  const history = useHistory()
 
   const initialSignupVals: SignupType = {
     username: '',
@@ -52,7 +49,13 @@ const SignupForm: React.FunctionComponent = () => {
     confirmPassword: '',
   }
 
-  const handleSubmit = () => {}
+  const handleSubmit = async (vals: SignupType) => {
+    const result = await registerUser(vals)
+
+    if (result) {
+      history.push('/emailconfirm')
+    }
+  }
 
   return (
     <div>
@@ -61,7 +64,9 @@ const SignupForm: React.FunctionComponent = () => {
         validationSchema={Yup.object().shape({
           username: Yup.string().required('Username is required'),
           email: Yup.string().required('Email is required'),
-          password: Yup.string().required('Password is required'),
+          password: Yup.string()
+            .required('Password is required')
+            .min(8, 'Password is too short - should be 8 chars minimum.'),
           confirmPassword: Yup.string()
             .required('Re-enter password')
             .when('password', {
@@ -69,7 +74,9 @@ const SignupForm: React.FunctionComponent = () => {
               then: Yup.string().oneOf([Yup.ref('password')], 'Password does not match'),
             }),
         })}
-        onSubmit={handleSubmit}
+        onSubmit={(values: SignupType) => {
+          handleSubmit(values)
+        }}
       >
         {(props: FormikProps<SignupType>) => {
           const { values, errors, handleBlur, handleChange } = props

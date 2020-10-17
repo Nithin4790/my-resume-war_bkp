@@ -19,6 +19,7 @@ import { loginError, loginStart, loginSuccess } from '../loginSlice'
 import { loginUser, validateUser } from '../../../api/Authentication'
 import { INVALID_CREDS, NETWORK_ERROR } from '../../../utils/error'
 import { RootState } from '../../../app/rootReducer'
+import { AuthenticationType } from '../../../api/model'
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -53,31 +54,25 @@ const LoginForm: React.FunctionComponent = () => {
     setError(errorState)
   }, [dispatch, errorState])
 
-  interface LoginType {
-    identifier: string
-    password: string
-    rememberUser: boolean
-  }
-
   const rememberedUser = localStorage.getItem('default-user')
 
-  const initialLoginVals: LoginType = {
+  const initialAuthenticationVals: AuthenticationType = {
     identifier: rememberedUser !== null ? rememberedUser : '',
     password: '',
-    rememberUser: true,
+    rememberMe: true,
   }
 
-  const handleSubmit = async (auth: LoginType) => {
+  const handleSubmit = async (auth: AuthenticationType) => {
     dispatch(loginStart())
     const creds = {
       userIdentifier: auth.identifier,
       userPassword: auth.password,
     }
 
-    if (auth.rememberUser) localStorage.setItem('default-user', auth.identifier)
+    if (auth.rememberMe) localStorage.setItem('default-user', auth.identifier)
     else localStorage.removeItem('default-user')
 
-    await loginUser(auth.identifier, auth.password).then((data) => {
+    await loginUser(auth).then((data) => {
       if (validateUser()) {
         dispatch(loginSuccess(creds))
         history.push('/dashboard/')
@@ -92,16 +87,16 @@ const LoginForm: React.FunctionComponent = () => {
   return (
     <div>
       <Formik
-        initialValues={initialLoginVals}
+        initialValues={initialAuthenticationVals}
         validationSchema={Yup.object().shape({
           identifier: Yup.string().required('Email/Username is required'),
           password: Yup.string().required('Password is required'),
         })}
-        onSubmit={(values: LoginType) => {
+        onSubmit={(values: AuthenticationType) => {
           handleSubmit(values)
         }}
       >
-        {(props: FormikProps<LoginType>) => {
+        {(props: FormikProps<AuthenticationType>) => {
           const { values, errors, handleBlur, handleChange } = props
           return (
             <Form>
@@ -155,7 +150,7 @@ const LoginForm: React.FunctionComponent = () => {
                     defaultChecked
                     name="rememberUser"
                     color="primary"
-                    value={values.rememberUser}
+                    value={values.rememberMe}
                     onChange={handleChange}
                   />
                 }

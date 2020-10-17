@@ -1,15 +1,16 @@
 import { ACCESS_TOKEN_KEY } from '../utils/constants'
 import instance from './axios'
+import { AuthenticationType } from './model'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function loginUser(userEmail: string, userPassword: string): Promise<any> {
+export async function loginUser(auth: AuthenticationType): Promise<any> {
   const url = '/auth/local/'
   let data = {}
-  if (userEmail !== '' && userPassword !== '') {
+  if (auth.identifier !== '' && auth.password !== '') {
     try {
       const response = await instance.post(url, {
-        identifier: userEmail,
-        password: userPassword,
+        identifier: auth.identifier,
+        password: auth.password,
       })
       data = response
       if (response.status === 200 || response.status === 201) {
