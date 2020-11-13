@@ -15,6 +15,7 @@ export const DashboardPage: React.FunctionComponent = () => {
   return (
     <div className={classes.wrapper}>
       <Header />
+      <p>Hello World!!!</p>
     </div>
   )
 }
