@@ -20,9 +20,9 @@ import { Button, Container, useTheme } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import DashboardIcon from '@material-ui/icons/Dashboard'
-import { logoutUser } from '../pages/login/loginSlice'
-import { logout, validateUser } from '../api/Authentication'
-import { DashboardPage } from '../pages/dashboard/DashboardPage'
+import { logoutUser } from '../login/loginSlice'
+import { logout, validateUser } from '../../api/Authentication'
+import { DashboardPage } from '../dashboard/DashboardPage'
 
 const drawerWidth = 240
 
@@ -92,8 +92,8 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: 'auto',
     },
     container: {
-      paddingTop: theme.spacing(4),
-      paddingBottom: theme.spacing(4),
+      paddingTop: theme.spacing(2),
+      paddingBottom: theme.spacing(2),
     },
     paper: {
       padding: theme.spacing(2),
@@ -110,8 +110,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
-const Header: React.FunctionComponent = () => {
+const MainPage: React.FunctionComponent = () => {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const isLoggedIn = validateUser()
@@ -132,7 +131,6 @@ const Header: React.FunctionComponent = () => {
       history.push('/')
     }
   }
-
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -213,4 +211,4 @@ const Header: React.FunctionComponent = () => {
   )
 }
 
-export default Header
+export default MainPage

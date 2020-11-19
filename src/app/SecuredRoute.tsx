@@ -22,7 +22,7 @@ const SecuredRoute = (props: PrivateRouteProps) => {
           ) : (
             <Redirect
               to={{
-                pathname: '/login/',
+                pathname: '/login',
                 state: { from: routeProps.location },
               }}
             />
